@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Monolith Validator Scene</title>
+  <style>
+    body {
+      margin: 0;
+      background: #050814;
+      font-family: system-ui, sans-serif;
+      color: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    #scene {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .core {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      box-shadow: 0 0 40px rgba(0, 255, 200, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: 0.4s ease all;
+    }
+
+    .ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 2px solid rgba(0, 255, 200, 0.4);
+      animation: spin 6s linear infinite;
+    }
+
+    .ring.r1 { width: 200px; height: 200px; }
+    .ring.r2 { width: 240px; height: 240px; animation-duration: 10s; }
+    .ring.r3 { width: 280px; height: 280px; animation-duration: 16s; }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    /* States */
+    .state-idle .core {
+      background: radial-gradient(circle, #00ffc8 0%, #003b2e 70%);
+    }
+
+    .state-validating .core {
+      background: radial-gradient(circle, #ffe066 0%, #7a5b00 70%);
+      box-shadow: 0 0 50px rgba(255, 224, 102, 0.8);
+    }
+
+    .state-success .core {
+      background: radial-gradient(circle, #7cff7c 0%, #005f2a 70%);
+      box-shadow: 0 0 60px rgba(124, 255, 124, 0.9);
+    }
+
+    .state-error .core {
+      background: radial-gradient(circle, #ff4b6e 0%, #5a0013 70%);
+      box-shadow: 0 0 60px rgba(255, 75, 110, 0.9);
+    }
+
+    #hud {
+      padding: 10px 16px;
+      background: rgba(5, 8, 20, 0.95);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 11px;
+    }
+
+    .badge-idle { color: #00ffc8; }
+    .badge-validating { color: #ffe066; }
+    .badge-success { color: #7cff7c; }
+    .badge-error { color: #ff4b6e; }
+
+    button {
+      background: #00ffc8;
+      border: none;
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #050814;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+  </style>
+</head>
+<body class="state-idle">
+  <div id="scene">
+    <div class="core">
+      <div class="ring r1"></div>
+      <div class="ring r2"></div>
+      <div class="ring r3"></div>
+    </div>
+  </div>
+  <div id="hud">
+    <div>
+      <span id="statusBadge" class="badge badge-idle">Idle · Validator wacht</span>
+    </div>
+    <div>
+      <button id="btnCallApi">Fake-API anstoßen</button>
+    </div>
+  </div>
+
+  <script>
+    const body = document.body;
+    const statusBadge = document.getElementById('statusBadge');
+    const btnCallApi = document.getElementById('btnCallApi');
+
+    const STATES = {
+      IDLE: 'idle',
+      VALIDATING: 'validating',
+      SUCCESS: 'success',
+      ERROR: 'error'
+    };
+
+    let currentState = STATES.IDLE;
+
+    function setState(state) {
+      currentState = state;
+      body.className = `state-${state}`;
+
+      switch (state) {
+        case STATES.IDLE:
+          statusBadge.textContent = 'Idle · Validator wacht';
+          statusBadge.className = 'badge badge-idle';
+          break;
+        case STATES.VALIDATING:
+          statusBadge.textContent = 'Validating · Mission läuft';
+          statusBadge.className = 'badge badge-validating';
+          break;
+        case STATES.SUCCESS:
+          statusBadge.textContent = 'Success · Mission erfüllt';
+          statusBadge.className = 'badge badge-success';
+          break;
+        case STATES.ERROR:
+          statusBadge.textContent = 'Error · Anomalie erkannt';
+          statusBadge.className = 'badge badge-error';
+          break;
+      }
+    }
+
+    function fakeApiCall() {
+      setState(STATES.VALIDATING);
+
+      // Simulierter „Server/Validator“-Zyklus
+      setTimeout(() => {
+        const ok = Math.random() > 0.2; // 80% Erfolg
+        if (ok) {
+          setState(STATES.SUCCESS);
+        } else {
+          setState(STATES.ERROR);
+        }
+
+        // Nach kurzer Zeit wieder in Idle
+        setTimeout(() => setState(STATES.IDLE), 1500);
+      }, 1200);
+    }
+
+    btnCallApi.addEventListener('click', fakeApiCall);
+  </script>
+</body>
+</html>
