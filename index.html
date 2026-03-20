@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
@@ -13,14 +14,14 @@
     font-family: system-ui, sans-serif;
   }
 
-  /* Three.js Fullscreen Layer (3D Sphäre / Universum) */
+  /* Fullscreen 3D Universe Layer */
   #three-root {
     position: fixed;
     inset: 0;
     z-index: 0;
   }
 
-  /* 2D Dark-Matter-Core im Zentrum (Validator-Herz) */
+  /* 2D Dark-Matter-Core (Validator Heart) */
   #coreZone {
     position: fixed;
     inset: 0;
@@ -36,7 +37,7 @@
     height: 40vmin;
   }
 
-  /* Optional: HUD-Overlay für spätere Zustände (minimal, nicht interaktiv) */
+  /* HUD */
   #hud {
     position: fixed;
     bottom: 12px;
@@ -57,22 +58,26 @@
 </head>
 <body>
 
-</div>
+<!-- 3D Universe -->
+<div id="three-root"></div>
 
+<!-- Validator Core -->
 <div id="coreZone">
   <canvas id="coreCanvas"></canvas>
 </div>
 
+<!-- HUD -->
 <div id="hud">PortableAI · Neural Validator läuft</div>
 
+<!-- Three.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
+
+<!-- Universe Loader (lädt ALLE Szenen aus /universe/) -->
+<script src="universe/loader.js"></script>
 
 <script>
 /* ============================================================
    TEIL 1: INFINITES NEURONALES UNIVERSUM (3D SPHÄRE, FULLSCREEN)
-   – Kamera im Zentrum
-   – Sphäre als Innenwelt (unendliche Tiefe)
-   – Portal-Plane als Szenen-Knotenpunkt
 ============================================================ */
 
 const threeRoot = document.getElementById("three-root");
@@ -89,9 +94,9 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 threeRoot.appendChild(renderer.domElement);
 
-/* Unendliche neuronale Sphäre (Innenwelt) */
+/* Unendliche neuronale Sphäre */
 const sphereGeometry = new THREE.SphereGeometry(50, 128, 128);
-sphereGeometry.scale(-1, 1, 1); // Innenseite sichtbar
+sphereGeometry.scale(-1, 1, 1);
 
 const sphereMaterial = new THREE.MeshBasicMaterial({
   map: new THREE.TextureLoader().load(
@@ -102,7 +107,10 @@ const sphereMaterial = new THREE.MeshBasicMaterial({
 const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 scene.add(sphere);
 
-/* Portal-Plane als 2D-Fenster für 3D-Szenen-Knoten */
+/* ============================================================
+   TEIL 2: DEINE PORTAL-PLANE + MINI-3D-SZENE (KNOTENPUNKT)
+============================================================ */
+
 const portalGeometry = new THREE.PlaneGeometry(20, 12);
 const portalMaterial = new THREE.MeshBasicMaterial({
   color: 0x8844ff,
@@ -113,7 +121,6 @@ const portal = new THREE.Mesh(portalGeometry, portalMaterial);
 portal.position.set(0, 0, -30);
 scene.add(portal);
 
-/* Kleine 3D-Szene im Portal: Knotenpunkt (Mini-Welt) */
 const nodeGroup = new THREE.Group();
 scene.add(nodeGroup);
 
@@ -134,9 +141,7 @@ nodeLight.position.set(5, 5, -20);
 nodeGroup.add(nodeLight);
 
 /* ============================================================
-   TEIL 2: 2D DARK-MATTER-CORE (VALIDATOR-HERZ) IM ZENTRUM
-   – Pulsierende Kugel
-   – Neuronale Sparks
+   TEIL 3: 2D DARK-MATTER-CORE (VALIDATOR-HERZ)
 ============================================================ */
 
 const coreCanvas = document.getElementById("coreCanvas");
@@ -147,6 +152,7 @@ function resizeCore() {
   coreCanvas.height = coreCanvas.offsetHeight;
 }
 resizeCore();
+
 window.addEventListener("resize", () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
   camera.aspect = window.innerWidth / window.innerHeight;
@@ -194,16 +200,11 @@ function drawCore() {
   }
 
   coreCtx.restore();
-
   tCore++;
 }
 
 /* ============================================================
-   TEIL 3: GESAMT-ANIMATION
-   – Sphäre rotiert (unendliches Universum)
-   – Portal schwebt
-   – Knotenpunkt rotiert
-   – 2D-Core pulsiert
+   TEIL 4: ANIMATION
 ============================================================ */
 
 function animate() {
