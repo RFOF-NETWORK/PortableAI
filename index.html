@@ -1,189 +1,229 @@
-<!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <title>Monolith Validator Scene</title>
-  <style>
-    body {
-      margin: 0;
-      background: #050814;
-      font-family: system-ui, sans-serif;
-      color: #f5f5f5;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
+<meta charset="UTF-8">
+<title>PortableAI – Final Neural Monolith</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    background: #000;
+    font-family: system-ui, sans-serif;
+  }
 
-    #scene {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
+  /* Three.js Fullscreen Layer (3D Sphäre / Universum) */
+  #three-root {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+  }
 
-    .core {
-      width: 160px;
-      height: 160px;
-      border-radius: 50%;
-      box-shadow: 0 0 40px rgba(0, 255, 200, 0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      transition: 0.4s ease all;
-    }
+  /* 2D Dark-Matter-Core im Zentrum (Validator-Herz) */
+  #coreZone {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 2;
+  }
 
-    .ring {
-      position: absolute;
-      border-radius: 50%;
-      border: 2px solid rgba(0, 255, 200, 0.4);
-      animation: spin 6s linear infinite;
-    }
+  #coreCanvas {
+    width: 40vmin;
+    height: 40vmin;
+  }
 
-    .ring.r1 { width: 200px; height: 200px; }
-    .ring.r2 { width: 240px; height: 240px; animation-duration: 10s; }
-    .ring.r3 { width: 280px; height: 280px; animation-duration: 16s; }
-
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(360deg); }
-    }
-
-    /* States */
-    .state-idle .core {
-      background: radial-gradient(circle, #00ffc8 0%, #003b2e 70%);
-    }
-
-    .state-validating .core {
-      background: radial-gradient(circle, #ffe066 0%, #7a5b00 70%);
-      box-shadow: 0 0 50px rgba(255, 224, 102, 0.8);
-    }
-
-    .state-success .core {
-      background: radial-gradient(circle, #7cff7c 0%, #005f2a 70%);
-      box-shadow: 0 0 60px rgba(124, 255, 124, 0.9);
-    }
-
-    .state-error .core {
-      background: radial-gradient(circle, #ff4b6e 0%, #5a0013 70%);
-      box-shadow: 0 0 60px rgba(255, 75, 110, 0.9);
-    }
-
-    #hud {
-      padding: 10px 16px;
-      background: rgba(5, 8, 20, 0.95);
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 14px;
-    }
-
-    .badge {
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      font-size: 11px;
-    }
-
-    .badge-idle { color: #00ffc8; }
-    .badge-validating { color: #ffe066; }
-    .badge-success { color: #7cff7c; }
-    .badge-error { color: #ff4b6e; }
-
-    button {
-      background: #00ffc8;
-      border: none;
-      border-radius: 999px;
-      padding: 6px 14px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      color: #050814;
-    }
-
-    button:active {
-      transform: scale(0.97);
-    }
-  </style>
+  /* Optional: HUD-Overlay für spätere Zustände (minimal, nicht interaktiv) */
+  #hud {
+    position: fixed;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(0, 0, 0, 0.6);
+    color: #cfcfe8;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    z-index: 3;
+    pointer-events: none;
+  }
+</style>
 </head>
-<body class="state-idle">
-  <div id="scene">
-    <div class="core">
-      <div class="ring r1"></div>
-      <div class="ring r2"></div>
-      <div class="ring r3"></div>
-    </div>
-  </div>
-  <div id="hud">
-    <div>
-      <span id="statusBadge" class="badge badge-idle">Idle · Validator wacht</span>
-    </div>
-    <div>
-      <button id="btnCallApi">Fake-API anstoßen</button>
-    </div>
-  </div>
+<body>
 
-  <script>
-    const body = document.body;
-    const statusBadge = document.getElementById('statusBadge');
-    const btnCallApi = document.getElementById('btnCallApi');
+</div>
 
-    const STATES = {
-      IDLE: 'idle',
-      VALIDATING: 'validating',
-      SUCCESS: 'success',
-      ERROR: 'error'
-    };
+<div id="coreZone">
+  <canvas id="coreCanvas"></canvas>
+</div>
 
-    let currentState = STATES.IDLE;
+<div id="hud">PortableAI · Neural Validator läuft</div>
 
-    function setState(state) {
-      currentState = state;
-      body.className = `state-${state}`;
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
 
-      switch (state) {
-        case STATES.IDLE:
-          statusBadge.textContent = 'Idle · Validator wacht';
-          statusBadge.className = 'badge badge-idle';
-          break;
-        case STATES.VALIDATING:
-          statusBadge.textContent = 'Validating · Mission läuft';
-          statusBadge.className = 'badge badge-validating';
-          break;
-        case STATES.SUCCESS:
-          statusBadge.textContent = 'Success · Mission erfüllt';
-          statusBadge.className = 'badge badge-success';
-          break;
-        case STATES.ERROR:
-          statusBadge.textContent = 'Error · Anomalie erkannt';
-          statusBadge.className = 'badge badge-error';
-          break;
-      }
-    }
+<script>
+/* ============================================================
+   TEIL 1: INFINITES NEURONALES UNIVERSUM (3D SPHÄRE, FULLSCREEN)
+   – Kamera im Zentrum
+   – Sphäre als Innenwelt (unendliche Tiefe)
+   – Portal-Plane als Szenen-Knotenpunkt
+============================================================ */
 
-    function fakeApiCall() {
-      setState(STATES.VALIDATING);
+const threeRoot = document.getElementById("three-root");
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(
+  60,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
+camera.position.set(0, 0, 0);
 
-      // Simulierter „Server/Validator“-Zyklus
-      setTimeout(() => {
-        const ok = Math.random() > 0.2; // 80% Erfolg
-        if (ok) {
-          setState(STATES.SUCCESS);
-        } else {
-          setState(STATES.ERROR);
-        }
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+threeRoot.appendChild(renderer.domElement);
 
-        // Nach kurzer Zeit wieder in Idle
-        setTimeout(() => setState(STATES.IDLE), 1500);
-      }, 1200);
-    }
+/* Unendliche neuronale Sphäre (Innenwelt) */
+const sphereGeometry = new THREE.SphereGeometry(50, 128, 128);
+sphereGeometry.scale(-1, 1, 1); // Innenseite sichtbar
 
-    btnCallApi.addEventListener('click', fakeApiCall);
-  </script>
+const sphereMaterial = new THREE.MeshBasicMaterial({
+  map: new THREE.TextureLoader().load(
+    "https://threejs.org/examples/textures/galaxy_starfield.png"
+  )
+});
+
+const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+scene.add(sphere);
+
+/* Portal-Plane als 2D-Fenster für 3D-Szenen-Knoten */
+const portalGeometry = new THREE.PlaneGeometry(20, 12);
+const portalMaterial = new THREE.MeshBasicMaterial({
+  color: 0x8844ff,
+  opacity: 0.25,
+  transparent: true
+});
+const portal = new THREE.Mesh(portalGeometry, portalMaterial);
+portal.position.set(0, 0, -30);
+scene.add(portal);
+
+/* Kleine 3D-Szene im Portal: Knotenpunkt (Mini-Welt) */
+const nodeGroup = new THREE.Group();
+scene.add(nodeGroup);
+
+const nodeGeometry = new THREE.IcosahedronGeometry(2, 1);
+const nodeMaterial = new THREE.MeshStandardMaterial({
+  color: 0x9b5bff,
+  roughness: 0.3,
+  metalness: 0.7,
+  emissive: 0x3b0f66,
+  emissiveIntensity: 0.8
+});
+const nodeCore = new THREE.Mesh(nodeGeometry, nodeMaterial);
+nodeCore.position.set(0, 0, -30);
+nodeGroup.add(nodeCore);
+
+const nodeLight = new THREE.PointLight(0xaa66ff, 2, 80);
+nodeLight.position.set(5, 5, -20);
+nodeGroup.add(nodeLight);
+
+/* ============================================================
+   TEIL 2: 2D DARK-MATTER-CORE (VALIDATOR-HERZ) IM ZENTRUM
+   – Pulsierende Kugel
+   – Neuronale Sparks
+============================================================ */
+
+const coreCanvas = document.getElementById("coreCanvas");
+const coreCtx = coreCanvas.getContext("2d");
+
+function resizeCore() {
+  coreCanvas.width = coreCanvas.offsetWidth;
+  coreCanvas.height = coreCanvas.offsetHeight;
+}
+resizeCore();
+window.addEventListener("resize", () => {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  resizeCore();
+});
+
+let tCore = 0;
+
+function drawCore() {
+  const w = coreCanvas.width;
+  const h = coreCanvas.height;
+  const r = Math.min(w, h) / 2;
+
+  coreCtx.clearRect(0, 0, w, h);
+
+  const pulse = 0.05 * Math.sin(tCore * 0.03);
+
+  coreCtx.save();
+  coreCtx.translate(w / 2, h / 2);
+
+  const grad = coreCtx.createRadialGradient(
+    0, 0, r * 0.1,
+    0, 0, r * (1 + pulse)
+  );
+  grad.addColorStop(0, "rgba(40, 0, 80, 0.95)");
+  grad.addColorStop(0.4, "rgba(10, 0, 30, 0.85)");
+  grad.addColorStop(1, "rgba(0, 0, 0, 0.0)");
+
+  coreCtx.fillStyle = grad;
+  coreCtx.beginPath();
+  coreCtx.arc(0, 0, r * (1 + pulse), 0, Math.PI * 2);
+  coreCtx.fill();
+
+  for (let i = 0; i < 40; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const dist = (Math.random() * 0.7 + 0.2) * r;
+    const x = Math.cos(angle) * dist;
+    const y = Math.sin(angle) * dist;
+
+    coreCtx.fillStyle = `rgba(160, 80, 255, ${0.05 + Math.random() * 0.12})`;
+    coreCtx.beginPath();
+    coreCtx.arc(x, y, 2 + Math.random() * 3, 0, Math.PI * 2);
+    coreCtx.fill();
+  }
+
+  coreCtx.restore();
+
+  tCore++;
+}
+
+/* ============================================================
+   TEIL 3: GESAMT-ANIMATION
+   – Sphäre rotiert (unendliches Universum)
+   – Portal schwebt
+   – Knotenpunkt rotiert
+   – 2D-Core pulsiert
+============================================================ */
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  sphere.rotation.y += 0.0008;
+  sphere.rotation.x += 0.0003;
+
+  portal.position.z = -30 + Math.sin(Date.now() * 0.001) * 0.7;
+  portal.rotation.y = Math.sin(Date.now() * 0.0005) * 0.1;
+
+  nodeCore.rotation.x += 0.01;
+  nodeCore.rotation.y += 0.013;
+
+  drawCore();
+  renderer.render(scene, camera);
+}
+
+animate();
+</script>
+
 </body>
 </html>
