@@ -1,0 +1,4 @@
+{
+  "type": "cluster",
+  "entry": "cluster.js"
+}
