@@ -1,0 +1,26 @@
+(async function() {
+  const response = await fetch("universe/config.json");
+  const config = await response.json();
+
+  for (const sceneName of config.scenes) {
+    const folder = `universe/scenes/${sceneName}/`;
+    const sceneConfig = await fetch(folder + "scene.json").then(r => r.json());
+
+    if (sceneConfig.type === "3d") {
+      const module = await import("./scenes/" + sceneName + "/" + sceneConfig.entry);
+      const instance = module.create(window.__PAI_SCENE__, window.THREE);
+
+      if (!window.__PAI_UPDATES__) window.__PAI_UPDATES__ = [];
+      window.__PAI_UPDATES__.push(instance.update);
+    }
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+    if (window.__PAI_UPDATES__) {
+      for (const update of window.__PAI_UPDATES__) update();
+    }
+  }
+
+  animate();
+})();
