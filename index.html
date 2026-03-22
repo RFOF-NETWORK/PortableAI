@@ -14,14 +14,12 @@
     font-family: system-ui, sans-serif;
   }
 
-  /* Fullscreen 3D Universe Layer */
   #three-root {
     position: fixed;
     inset: 0;
     z-index: 0;
   }
 
-  /* 2D Dark-Matter-Core (Validator Heart) */
   #coreZone {
     position: fixed;
     inset: 0;
@@ -37,7 +35,6 @@
     height: 40vmin;
   }
 
-  /* HUD */
   #hud {
     position: fixed;
     bottom: 12px;
@@ -58,61 +55,51 @@
 </head>
 <body>
 
-<!-- 3D Universe -->
 <div id="three-root"></div>
 
-<!-- Validator Core -->
 <div id="coreZone">
   <canvas id="coreCanvas"></canvas>
 </div>
 
-<!-- HUD -->
 <div id="hud">PortableAI · Neural Validator läuft</div>
 
-<!-- Three.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
-
-<!-- Universe Loader (lädt ALLE Szenen aus /universe/) -->
-<script src="universe/loader.js"></script>
 
 <script>
 /* ============================================================
-   TEIL 1: INFINITES NEURONALES UNIVERSUM (3D SPHÄRE, FULLSCREEN)
+   TEIL 1: UNIVERSE SETUP
 ============================================================ */
 
 const threeRoot = document.getElementById("three-root");
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(
-  60,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(0, 0, 0);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 threeRoot.appendChild(renderer.domElement);
+
+/* >>> PortableAI Universe Hooks <<< */
 window.__PAI_SCENE__ = scene;
 window.__PAI_CAMERA__ = camera;
 window.__PAI_RENDERER__ = renderer;
 window.__PAI_UPDATES__ = window.__PAI_UPDATES__ || [];
 
-/* Unendliche neuronale Sphäre */
+/* ============================================================
+   TEIL 2: BACKGROUND SPHERE
+============================================================ */
+
 const sphereGeometry = new THREE.SphereGeometry(50, 128, 128);
 sphereGeometry.scale(-1, 1, 1);
 
 const sphereMaterial = new THREE.MeshBasicMaterial({
-  map: new THREE.TextureLoader().load(
-    "https://threejs.org/examples/textures/galaxy_starfield.png"
-  )
+  map: new THREE.TextureLoader().load("https://threejs.org/examples/textures/galaxy_starfield.png")
 });
 
-const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-scene.add(sphere);
+scene.add(new THREE.Mesh(sphereGeometry, sphereMaterial));
 
 /* ============================================================
-   TEIL 2: DEINE PORTAL-PLANE + MINI-3D-SZENE (KNOTENPUNKT)
+   TEIL 3: PORTAL + NODE
 ============================================================ */
 
 const portalGeometry = new THREE.PlaneGeometry(20, 12);
@@ -145,7 +132,7 @@ nodeLight.position.set(5, 5, -20);
 nodeGroup.add(nodeLight);
 
 /* ============================================================
-   TEIL 3: 2D DARK-MATTER-CORE (VALIDATOR-HERZ)
+   TEIL 4: VALIDATOR CORE (2D)
 ============================================================ */
 
 const coreCanvas = document.getElementById("coreCanvas");
@@ -178,10 +165,7 @@ function drawCore() {
   coreCtx.save();
   coreCtx.translate(w / 2, h / 2);
 
-  const grad = coreCtx.createRadialGradient(
-    0, 0, r * 0.1,
-    0, 0, r * (1 + pulse)
-  );
+  const grad = coreCtx.createRadialGradient(0, 0, r * 0.1, 0, 0, r * (1 + pulse));
   grad.addColorStop(0, "rgba(40, 0, 80, 0.95)");
   grad.addColorStop(0.4, "rgba(10, 0, 30, 0.85)");
   grad.addColorStop(1, "rgba(0, 0, 0, 0.0)");
@@ -191,24 +175,12 @@ function drawCore() {
   coreCtx.arc(0, 0, r * (1 + pulse), 0, Math.PI * 2);
   coreCtx.fill();
 
-  for (let i = 0; i < 40; i++) {
-    const angle = Math.random() * Math.PI * 2;
-    const dist = (Math.random() * 0.7 + 0.2) * r;
-    const x = Math.cos(angle) * dist;
-    const y = Math.sin(angle) * dist;
-
-    coreCtx.fillStyle = `rgba(160, 80, 255, ${0.05 + Math.random() * 0.12})`;
-    coreCtx.beginPath();
-    coreCtx.arc(x, y, 2 + Math.random() * 3, 0, Math.PI * 2);
-    coreCtx.fill();
-  }
-
   coreCtx.restore();
   tCore++;
 }
 
 /* ============================================================
-   TEIL 4: ANIMATION
+   TEIL 5: ANIMATION
 ============================================================ */
 
 function animate() {
@@ -229,6 +201,9 @@ function animate() {
 
 animate();
 </script>
+
+<!-- >>> Universe Loader MUSS GANZ UNTEN STEHEN <<< -->
+<script src="universe/loader.js"></script>
 
 </body>
 </html>
