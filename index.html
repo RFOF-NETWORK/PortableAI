@@ -93,6 +93,10 @@ camera.position.set(0, 0, 0);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 threeRoot.appendChild(renderer.domElement);
+window.__PAI_SCENE__ = scene;
+window.__PAI_CAMERA__ = camera;
+window.__PAI_RENDERER__ = renderer;
+window.__PAI_UPDATES__ = window.__PAI_UPDATES__ || [];
 
 /* Unendliche neuronale Sphäre */
 const sphereGeometry = new THREE.SphereGeometry(50, 128, 128);
