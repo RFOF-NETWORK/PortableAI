@@ -1,4 +1,17 @@
 {
+  "name": "darkmatter-core",
   "type": "shader",
-  "entry": "darkmatter.glsl"
+
+  "entry": "core.js",
+  "shader": "darkmatter.glsl",
+
+  "description": "Pulsierender Darkmatter-Energie-Kern im PortableAI-Universum.",
+  "version": 1,
+
+  "meta": {
+    "autoPosition": true,
+    "autoScale": true,
+    "category": "energy-core",
+    "rootType": "plane"
+  }
 }
